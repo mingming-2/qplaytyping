@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>큐플레이 아카이브 족보 | 큐플레이 족보 · 밍밍족보</title>
+<meta name="description" content="큐플레이 아카이브 족보 검색 사이트. 큐플레이 족보, 밍밍족보 - 올라올라(꼬로록), 꽁꽁, OX·XO, 가로세로 문제를 입력하면 정답을 바로 찾아드려요.">
+<meta name="keywords" content="큐플레이 아카이브 족보, 큐플레이 족보, 큐플레이 밍밍족보, 밍밍족보, 큐플레이 웹족보, 큐플레이 아카이브">
+<meta property="og:title" content="큐플레이 아카이브 족보">
+<meta property="og:description" content="큐플레이 족보 검색 - 문제를 입력하면 정답을 찾아드려요. (큐플레이 족보 · 밍밍족보)">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
+<style>
+  :root{
+    --ink:#0E1020; --surface:#181B34; --surface-2:#20244a; --line:#2c3160;
+    --text:#EDEEF7; --muted:#8A90BC; --buzz:#C6F135; --hot:#FF4D97; --radius:14px;
+  }
+  body.light{
+    --ink:#e9f1fb; --surface:#ffffff; --surface-2:#eaf2fc; --line:#bcd6ef;
+    --text:#12324f; --muted:#5b7a99; --buzz:#1663b8; --hot:#e8912a;
+  }
+  /* ===== 테마들 (배경/포인트만 바꾸고, 카드는 흰색·글씨는 검정) ===== */
+  body[data-theme="light"]{ --ink:#eef3f8; --surface:#ffffff; --surface-2:#eef3f8; --line:#d6e0ea;
+    --text:#1b2b3a; --muted:#5b7a99; --buzz:#1f6fc9; --hot:#e8912a; --ans:#111111; }
+  body[data-theme="light"]{ background:#eef3f8; }
+  body[data-theme="light"] .dot{background:#f0a91e;box-shadow:0 0 0 4px rgba(240,169,30,.2),0 0 20px rgba(240,169,30,.4)}
+
+  body[data-theme="kkong"]{ --ink:#eaf2fc; --surface:#ffffff; --surface-2:#eaf2fc; --line:#bcd6ef;
+    --text:#1b2b3a; --muted:#cfe4fb; --buzz:#1663b8; --hot:#f0a91e; --ans:#111111; }
+  body[data-theme="kkong"]{ background:linear-gradient(180deg,#3080d2 0%,#1f5fa8 100%); }
+  body[data-theme="kkong"] .dot{background:#ffd23c;box-shadow:0 0 0 4px rgba(255,210,60,.25),0 0 22px rgba(255,210,60,.5)}
+
+  body[data-theme="koro"]{ --ink:#e6f5f7; --surface:#ffffff; --surface-2:#e6f5f7; --line:#a9dbe2;
+    --text:#0d3540; --muted:#c8eef4; --buzz:#0b7c92; --hot:#e88a1a; --ans:#111111; }
+  body[data-theme="koro"]{ background:linear-gradient(180deg,#0f8a9c 0%,#0a5f78 100%); }
+  body[data-theme="koro"] .dot{background:#ffd23c;box-shadow:0 0 0 4px rgba(255,210,60,.25),0 0 22px rgba(255,210,60,.5)}
+
+  body[data-theme="ox"]{ --ink:#eef6e5; --surface:#ffffff; --surface-2:#eef6e5; --line:#bfe0a0;
+    --text:#233b16; --muted:#eaf7dc; --buzz:#4a8a1f; --hot:#d98014; --ans:#111111; }
+  body[data-theme="ox"]{ background:linear-gradient(180deg,#8fce5a 0%,#5fa838 100%); }
+  body[data-theme="ox"] .dot{background:#ffce3b;box-shadow:0 0 0 4px rgba(255,206,59,.25),0 0 22px rgba(255,206,59,.5)}
+
+  /* 밝은 테마 공통: 제목 흰색, 정답 검정, notice/mark 손보기 */
+  body[data-theme="kkong"] h1, body[data-theme="koro"] h1, body[data-theme="ox"] h1{color:#fff}
+  body[data-theme="kkong"] h1 span, body[data-theme="koro"] h1 span, body[data-theme="ox"] h1 span{color:rgba(255,255,255,.85)}
+  body[data-theme="light"] h1{color:#123a63} body[data-theme="light"] h1 span{color:#3d6a97}
+  body[data-theme="light"] .a, body[data-theme="kkong"] .a, body[data-theme="koro"] .a, body[data-theme="ox"] .a{color:var(--ans)}
+  body[data-theme="light"] .notice, body[data-theme="kkong"] .notice, body[data-theme="koro"] .notice, body[data-theme="ox"] .notice{background:rgba(255,255,255,.92);border-color:var(--line)}
+  body[data-theme="light"] mark, body[data-theme="kkong"] mark, body[data-theme="koro"] mark, body[data-theme="ox"] mark{background:rgba(240,169,30,.28)}
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    font-family:"Pretendard Variable",Pretendard,system-ui,sans-serif;
+    background:
+      radial-gradient(900px 500px at 15% -10%, #1b2050 0%, transparent 60%),
+      radial-gradient(700px 500px at 110% 10%, #2a1440 0%, transparent 55%),
+      var(--ink);
+    color:var(--text);min-height:100vh;padding:20px 16px 60px;line-height:1.5;
+  }
+  .wrap{max-width:720px;margin:0 auto}
+  header{display:flex;align-items:center;flex-wrap:wrap;gap:12px;margin:8px 2px 18px}
+  .dot{width:22px;height:22px;border-radius:50%;background:var(--buzz);
+    box-shadow:0 0 0 4px rgba(198,241,53,.18),0 0 22px rgba(198,241,53,.55);
+    animation:pulse 2.4s ease-in-out infinite;flex:0 0 auto}
+  @keyframes pulse{50%{box-shadow:0 0 0 8px rgba(198,241,53,.08),0 0 26px rgba(198,241,53,.7)}}
+  h1{font-size:20px;font-weight:800;letter-spacing:-.02em;flex:1}
+  h1 span{color:var(--muted);font-weight:600;font-size:13px;display:block;letter-spacing:0}
+  /* 상단 우측 제보 버튼 */
+  .hbtns{display:flex;gap:8px;margin-left:auto}
+  .hbtn{height:42px;padding:0 13px;border-radius:12px;border:1.5px solid var(--line);
+    background:var(--surface);color:var(--buzz);cursor:pointer;display:inline-flex;
+    align-items:center;gap:7px;font-family:inherit;font-size:14px;font-weight:700;
+    transition:border-color .15s, transform .1s}
+  .hbtn span{color:var(--text)}
+  .hbtn:hover{border-color:var(--buzz)}
+  .hbtn:active{transform:scale(.94)}
+  .hbtn svg{width:19px;height:19px}
+  /* 테마 색 점 메뉴 */
+  .theme-wrap{position:relative;display:inline-flex}
+  #theme-menu{position:absolute;top:48px;right:0;display:flex;gap:9px;align-items:center;
+    background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:9px 11px;
+    box-shadow:0 10px 30px rgba(0,0,0,.35);z-index:120}
+  #theme-menu[hidden]{display:none}
+  #theme-menu .sw{width:22px;height:22px;border-radius:50%;cursor:pointer;box-shadow:0 0 0 1px rgba(0,0,0,.15)}
+  #theme-menu .sw.on{box-shadow:0 0 0 2px var(--surface),0 0 0 4px var(--buzz)}
+  .mtitle{font-size:15px;font-weight:800;color:var(--text);padding:12px 8px}
+  .info-body{padding:16px;max-height:70vh;overflow:auto}
+  /* 빠른 독음 찾기 */
+  .searchrow{display:flex;gap:8px;margin-bottom:12px}
+  .searchrow .search{flex:1;margin-bottom:0}
+  .dokeum-btn{flex:0 0 auto;display:flex;align-items:center;gap:5px;padding:0 16px;font-size:15px;white-space:nowrap;
+    font-weight:500;font-family:inherit;cursor:pointer;background:var(--surface);color:var(--buzz);
+    border:1.5px solid var(--line);border-radius:var(--radius);transition:border-color .15s}
+  .dokeum-btn:hover{border-color:var(--buzz)}
+  .dk-modal{max-width:560px;display:flex;flex-direction:column;max-height:92vh}
+  .dk-sub{font-size:12px;color:var(--muted);padding:0 8px 2px}
+  .dk-tabs{display:flex;gap:6px;padding:10px 14px 0;flex-wrap:wrap}
+  .dk-tab{font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;color:var(--muted);
+    background:var(--surface-2);border:0;padding:6px 12px;border-radius:999px}
+  .dk-tab.on{color:var(--ink);background:var(--buzz)}
+  .dk-search{padding:11px 14px 0}
+  .dk-search input{width:100%;box-sizing:border-box;padding:10px 12px;font-size:15px;font-family:inherit;
+    background:var(--ink);border:1.5px solid var(--line);border-radius:10px;color:var(--text);outline:none}
+  .dk-search input:focus{border-color:var(--buzz)}
+  .dk-jump{display:flex;gap:5px;padding:9px 14px 0;flex-wrap:wrap}
+  .dk-jump span{font-size:12px;font-weight:700;color:var(--muted);background:var(--surface-2);
+    padding:3px 9px;border-radius:7px;cursor:pointer}
+  .dk-jump span:hover{color:var(--buzz)}
+  .dk-body{flex:1;overflow-y:auto;padding:12px 14px 16px}
+  .dk-sec{font-size:12px;font-weight:700;color:var(--buzz);margin:14px 2px 7px}
+  .dk-sec:first-child{margin-top:2px}
+  .dk-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+  .dk-card{background:var(--surface-2);border:1px solid var(--line);border-radius:10px;
+    padding:12px 3px 9px;text-align:center;cursor:pointer;transition:border-color .1s}
+  .dk-card.copyable:hover{border-color:var(--buzz)}
+  .dk-card .hanja{font-size:29px;font-weight:200;color:var(--buzz);line-height:1.1;word-break:keep-all}
+  .dk-card .kor{font-size:13px;font-weight:600;color:#B9BEE6;margin-top:5px}
+  .dk-empty{text-align:center;color:var(--muted);font-size:14px;padding:32px 0}
+  .upd{padding:11px 0;border-bottom:1px solid var(--line)}
+  .upd:last-child{border-bottom:0}
+  .upd .d{font-size:12px;font-weight:700;color:var(--buzz);margin-bottom:3px}
+  .upd .m{font-size:14px;color:var(--text);line-height:1.55;white-space:pre-wrap}
+  .guide h4{font-size:14px;font-weight:800;color:var(--buzz);margin:14px 0 5px}
+  .guide h4:first-child{margin-top:0}
+  .guide p{font-size:14px;color:var(--text);line-height:1.6;margin:0}
+  .guide kbd{background:var(--ink);border:1px solid var(--line);border-radius:5px;
+    padding:1px 6px;font-size:12px;font-family:inherit;color:var(--text)}
+  .notice{display:flex;align-items:center;gap:9px;background:rgba(198,241,53,.10);
+    border:1px solid rgba(198,241,53,.35);border-radius:12px;padding:11px 13px;
+    margin-bottom:14px;font-size:13.5px;line-height:1.5;color:var(--text)}
+  .notice svg{width:18px;height:18px;flex:0 0 auto;color:var(--buzz)}
+  .notice b{color:var(--buzz);font-weight:800}
+
+  .search{position:relative;margin-bottom:12px}
+  .search input{width:100%;padding:16px 46px 16px 18px;font-size:16px;background:var(--surface);
+    border:1.5px solid var(--line);border-radius:var(--radius);color:var(--text);outline:none;
+    transition:border-color .15s, box-shadow .15s}
+  .search input:focus{border-color:var(--buzz);box-shadow:0 0 0 4px rgba(198,241,53,.14)}
+  .search input::placeholder{color:var(--muted)}
+  .clear{position:absolute;right:8px;top:50%;transform:translateY(-50%);border:0;background:var(--surface-2);
+    color:var(--muted);width:30px;height:30px;border-radius:8px;cursor:pointer;font-size:16px}
+  .clear:hover{color:var(--text)}
+  .controls{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px}
+  select{flex:1;min-width:120px;padding:10px 12px;font-size:14px;background:var(--surface);
+    border:1.5px solid var(--line);border-radius:10px;color:var(--text);outline:none;font-family:inherit}
+  select:focus{border-color:var(--buzz)}
+  .meta{font-size:13px;color:var(--muted);margin:14px 2px 10px}
+  .meta b{color:var(--buzz)}
+  .list{display:flex;flex-direction:column;gap:7px}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+    padding:11px 14px 10px;animation:rise .25s ease both}
+  @keyframes rise{from{opacity:0;transform:translateY(6px)}}
+  .cat{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.02em;color:var(--ink);
+    background:var(--buzz);padding:3px 9px;border-radius:999px;margin-bottom:7px}
+  .q{font-size:15px;font-weight:600;color:var(--text);margin-bottom:7px}
+  .a{display:flex;align-items:baseline;gap:8px;font-size:17px;font-weight:800;color:var(--buzz);
+    border-top:1px dashed var(--line);padding-top:8px;cursor:pointer}
+  .a .cp{align-self:center;margin-left:auto;width:15px;height:15px;color:var(--muted);flex:0 0 auto}
+  .a:hover .cp{color:var(--buzz)}
+  .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);
+    background:var(--buzz);color:var(--ink);font-weight:800;font-size:14px;padding:10px 18px;
+    border-radius:999px;opacity:0;pointer-events:none;transition:opacity .2s, transform .2s;z-index:200}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  .a::before{content:"정답";font-size:11px;font-weight:700;color:var(--hot);letter-spacing:.04em;
+    flex:0 0 auto;transform:translateY(-1px)}
+  mark{background:rgba(255,77,151,.25);color:var(--text);border-radius:3px;padding:0 2px}
+  .by{margin-top:6px;text-align:right;font-size:11px;color:var(--muted)}
+  .by b{color:var(--muted);font-weight:600}
+  .card.top{border-color:var(--buzz);box-shadow:0 0 0 1px var(--buzz)}
+  .autonote{color:var(--buzz);font-weight:700}
+  .empty{text-align:center;color:var(--muted);padding:48px 16px;font-size:14px}
+  .empty b{color:var(--text);display:block;margin-bottom:6px;font-size:15px}
+  .banner{background:var(--surface-2);border:1px solid var(--line);border-radius:var(--radius);
+    padding:14px 16px;font-size:13px;color:var(--muted);margin-bottom:14px;line-height:1.7}
+  .banner b{color:var(--buzz)}
+  .banner code{background:var(--ink);padding:2px 6px;border-radius:6px;color:var(--text);font-size:12px;word-break:break-all}
+  footer{margin-top:28px;font-size:12px;color:var(--muted);text-align:center;line-height:1.7}
+  .spin{display:inline-block;width:14px;height:14px;border:2px solid var(--line);
+    border-top-color:var(--buzz);border-radius:50%;animation:sp .7s linear infinite;vertical-align:-2px;margin-right:6px}
+  @keyframes sp{to{transform:rotate(360deg)}}
+
+  /* ── 제보 팝업 ── */
+  .modal-bg{position:fixed;inset:0;background:rgba(6,8,20,.72);backdrop-filter:blur(3px);
+    display:flex;align-items:center;justify-content:center;padding:16px;z-index:100}
+  .modal-bg[hidden]{display:none}
+  .modal{width:100%;max-width:440px;background:var(--surface);border:1px solid var(--line);
+    border-radius:18px;overflow:hidden;animation:pop .18s ease both}
+  @keyframes pop{from{opacity:0;transform:translateY(12px) scale(.98)}}
+  .modal-head{display:flex;align-items:center;justify-content:space-between;
+    padding:6px 6px 6px 6px;border-bottom:1px solid var(--line)}
+  .tabs{display:flex;gap:4px}
+  .tab{border:0;background:transparent;color:var(--muted);font-family:inherit;font-size:14px;
+    font-weight:700;padding:12px 14px;cursor:pointer;border-radius:10px}
+  .tab.active{color:var(--ink);background:var(--buzz)}
+  .mclose{border:0;background:transparent;color:var(--muted);font-size:20px;cursor:pointer;
+    width:38px;height:38px;border-radius:10px}
+  .mclose:hover{color:var(--text)}
+  .modal-body{padding:16px}
+  .pane[hidden]{display:none}
+  .field{margin-bottom:12px}
+  .field label{display:block;font-size:13px;font-weight:700;color:var(--muted);margin-bottom:6px}
+  .field input,.field textarea{width:100%;padding:11px 12px;font-size:15px;font-family:inherit;
+    background:var(--ink);border:1.5px solid var(--line);border-radius:10px;color:var(--text);outline:none}
+  .field select{width:100%;padding:11px 12px;font-size:15px;font-family:inherit;
+    background:var(--ink);border:1.5px solid var(--line);border-radius:10px;color:var(--text);outline:none}
+  .field select:focus{border-color:var(--buzz)}
+  .field input:focus,.field textarea:focus{border-color:var(--buzz)}
+  .field textarea{resize:vertical;min-height:72px}
+  .send{width:100%;padding:14px;font-size:15px;font-weight:800;font-family:inherit;
+    background:var(--buzz);color:var(--ink);border:0;border-radius:12px;cursor:pointer;margin-top:4px}
+  .send:hover{filter:brightness(1.05)}
+  .send:disabled{opacity:.5;cursor:default}
+  .msg{margin-top:12px;font-size:13px;text-align:center;min-height:18px}
+  .msg.ok{color:var(--buzz)}
+  .msg.err{color:var(--hot)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="dot"></div>
+    <h1>큐플레이 아카이브 웹족보<span>문제를 입력하면 정답을 찾아드려요</span></h1>
+    <div class="hbtns">
+      <span class="theme-wrap"><button class="hbtn" id="theme-btn" aria-label="테마" title="테마">🎨</button><div id="theme-menu" hidden></div></span>
+      <button class="hbtn" id="btn-guide" aria-label="사용법" title="사용법">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 1 1 3.5 2.3c-.7.3-1 .8-1 1.7"/><path d="M12 17h.01"/></svg><span>사용법</span>
+      </button>
+      <button class="hbtn" id="btn-news" aria-label="공지사항" title="공지사항">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 11 18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/></svg><span>공지사항</span>
+      </button>
+      <button class="hbtn" id="fab" aria-label="제보하기" title="제보 / 버그 신고">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg><span>제보</span>
+      </button>
+    </div>
+  </header>
+
+  <div class="notice">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 11 18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/></svg>
+    <span>지금은 여러분의 힘이 필요할 때예요!<br><b>적극적으로 문제를 제보해 주세요!</b></span>
+  </div>
+
+  <div id="banner"></div>
+
+  <div class="controls">
+    <select id="cat"><option value="">게임 선택</option>
+      <option value="올라올라(꼬로록)">올라올라(꼬로록)</option>
+      <option value="꽁꽁">꽁꽁</option>
+      <option value="오엑스">오엑스</option>
+      <option value="가로,세로">가로,세로</option>
+    </select>
+    <select id="limit">
+      <option value="10">10건</option>
+      <option value="30" selected>30건</option>
+      <option value="50">50건</option>
+      <option value="9999">전체</option>
+    </select>
+    <select id="sort">
+      <option value="rel">관련순</option>
+      <option value="asc">가나다↑</option>
+      <option value="desc">가나다↓</option>
+    </select>
+  </div>
+
+  <div class="searchrow">
+    <div class="search">
+      <input id="q" type="text" placeholder="문제 일부만 입력해도 돼요…" autocomplete="off">
+      <button class="clear" id="clear" title="지우기">✕</button>
+    </div>
+    <button id="dokeum-open" class="dokeum-btn" hidden>📖 독음</button>
+  </div>
+
+  <div class="meta" id="meta"></div>
+  <div class="list" id="list"></div>
+
+  <footer></footer>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- 제보 / 버그 신고 팝업 -->
+<div class="modal-bg" id="modal" hidden>
+  <div class="modal">
+    <div class="modal-head">
+      <div class="tabs">
+        <button class="tab active" data-tab="q">문제 제보</button>
+        <button class="tab" data-tab="b">버그 신고</button>
+      </div>
+      <button class="mclose" id="mclose" aria-label="닫기">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="pane" id="pane-q">
+        <div class="field"><label>게임</label><select id="f-game">
+          <option value="" disabled selected>게임을 선택하세요</option>
+          <option value="올라올라(꼬로록)">올라올라(꼬로록)</option>
+          <option value="꽁꽁">꽁꽁</option>
+          <option value="오엑스">오엑스</option>
+          <option value="가로,세로">가로,세로</option>
+        </select></div>
+        <div class="field"><label>문제</label><textarea id="f-question" placeholder="예: 세계에서 가장 높은 산은?"></textarea></div>
+        <div class="field"><label>정답</label><input id="f-answer" type="text" placeholder="예: 에베레스트"></div>
+        <div class="field"><label>제보자 (닉네임)</label><input id="f-by" type="text" placeholder="사이트에 표시될 닉네임 (선택)"></div>
+        <button class="send" id="send-q">제보 보내기</button>
+      </div>
+      <div class="pane" id="pane-b" hidden>
+        <div class="field"><label>증상</label><textarea id="f-symptom" placeholder="어떤 문제가 있었는지 적어주세요"></textarea></div>
+        <button class="send" id="send-b">신고 보내기</button>
+      </div>
+      <div class="msg" id="msg"></div>
+    </div>
+  </div>
+</div>
+
+<!-- 업데이트 소식 / 사용법 팝업 -->
+<div class="modal-bg" id="infoModal" hidden>
+  <div class="modal">
+    <div class="modal-head">
+      <span class="mtitle" id="infoTitle"></span>
+      <button class="mclose" id="infoClose" aria-label="닫기">✕</button>
+    </div>
+    <div class="info-body" id="infoBody"></div>
+  </div>
+</div>
+
+<!-- 독음 빠른찾기 팝업 -->
+<div class="modal-bg" id="dkModal" hidden>
+  <div class="modal dk-modal">
+    <div class="modal-head">
+      <div>
+        <span class="mtitle" id="dkTitle">빠른 독음 찾기</span>
+        <div class="dk-sub" id="dkSub">카드를 눌러 복사</div>
+      </div>
+      <button class="mclose" id="dkClose" aria-label="닫기">✕</button>
+    </div>
+    <div class="dk-tabs" id="dkTabs"></div>
+    <div class="dk-search"><input id="dkq" type="text" placeholder="독음이나 한자로 찾기…" autocomplete="off"></div>
+    <div class="dk-jump" id="dkJump"></div>
+    <div class="dk-body" id="dkBody"></div>
+  </div>
+</div>
+
+<script>
+/* ══════════════════════════════════════════════════════════
+   ① 문제 데이터 (압축·암호화된 별도 파일에서 읽어요)
+      문제를 바꿀 땐 convert.html에 새 CSV를 넣어 qdata.txt 를
+      새로 만들어서 GitHub의 qdata.txt 를 교체하면 돼요.
+   ══════════════════════════════════════════════════════════ */
+const DATA_URL = "qdata.txt";
+const DATA_KEY = "qplay!2026#kkong";
+async function decodeData(){
+  const res = await fetch(DATA_URL);
+  if(!res.ok) throw new Error(res.status);
+  const b64 = (await res.text()).trim();
+  const bin = atob(b64), key = DATA_KEY, bytes = new Uint8Array(bin.length);
+  for(let i=0;i<bin.length;i++) bytes[i] = bin.charCodeAt(i) ^ key.charCodeAt(i%key.length);
+  const stream = new Blob([bytes]).stream().pipeThrough(new DecompressionStream("gzip"));
+  const buf = await new Response(stream).arrayBuffer();
+  return new TextDecoder().decode(buf);
+}
+
+/* ══════════════════════════════════════════════════════════
+   ② 제보/신고를 시트에 저장할 "앱스 스크립트 웹앱 주소"를 넣으세요.
+      (설정 방법은 안내를 참고하세요. 비워두면 제출이 안 돼요)
+      예: "https://script.google.com/macros/s/XXXX/exec"
+   ══════════════════════════════════════════════════════════ */
+const SUBMIT_ENDPOINT = "https://script.google.com/macros/s/AKfycbyuaLVZjwwzJX9o1jVkeicriEGCgOOCslr3YAownXYL6KcqlfuFxWChTcXbDA5I2_4s/exec";
+
+/* ══════════════════════════════════════════════════════════
+   ③ 공지사항 파일 (사이트에 같이 올려둔 파일에서 읽어요)
+      "업데이트 날짜, 업데이트 내용" 두 칸짜리 CSV예요.
+      GitHub에서 notice.csv 를 직접 고치거나,
+      시트 공지 탭을 CSV로 내려받아 notice.csv 로 올리면 돼요.
+   ══════════════════════════════════════════════════════════ */
+const UPDATES_CSV_URL = "notice.csv";
+
+const $ = s => document.querySelector(s);
+const norm = s => s.toLowerCase().replace(/[\s\p{P}\p{S}]+/gu,"");
+const esc  = s => s.replace(/[.*+?^${}()|[\]\\]/g,"\\$&");
+const escAttr = s => s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+let DATA = [];
+/* 이 게임들을 선택하면 검색 즉시 맨 위 정답이 자동 복사돼요 (꽁꽁=주관식) */
+const AUTOCOPY_GAMES = ["꽁꽁"];
+
+/* ── CSV 파서 ── */
+function parseCSV(text){
+  const rows=[]; let row=[], cur="", q=false;
+  for(let i=0;i<text.length;i++){
+    const c=text[i];
+    if(q){ if(c==='"'){ if(text[i+1]==='"'){cur+='"';i++;} else q=false; } else cur+=c; }
+    else{
+      if(c==='"') q=true;
+      else if(c===',') { row.push(cur); cur=""; }
+      else if(c==='\n'){ row.push(cur); rows.push(row); row=[]; cur=""; }
+      else if(c!=='\r') cur+=c;
+    }
+  }
+  if(cur!==""||row.length){ row.push(cur); rows.push(row); }
+  return rows;
+}
+function rowsToData(rows){
+  return rows.slice(1)
+    .filter(r=>r.length>=3 && (r[1]||"").trim() && (r[0]||"").trim()!=="올라타자")
+    .map(r=>{
+      const q=(r[1]||"").trim();
+      return { cat:(r[0]||"기타").trim(), q, a:(r[2]||"").trim(), by:(r[3]||"").trim(), qn:norm(q) };
+    });
+}
+
+/* ── 검색 ── */
+function allCharsIn(q, text){ // q의 모든 글자가 text에 있으면 true (순서 무관)
+  for(const ch of new Set(q)){ if(!text.includes(ch)) return false; }
+  return true;
+}
+function score(tokens,qjoined,item){
+  const qt=item.qn||norm(item.q);
+  if(!tokens.length) return 0;
+  // 1) 모든 단어가 '붙어있는 그대로' 들어있으면 최고점
+  let allSub=true, first=Infinity;
+  for(const t of tokens){
+    const idx=qt.indexOf(t);
+    if(idx===-1){ allSub=false; break; }
+    if(idx<first) first=idx;
+  }
+  if(allSub) return Math.max(40, 100-first);
+  // 2) 폴백: 검색어의 모든 글자가 문제에 있으면(순서 무관) 낮은 점수
+  if(qjoined.length>=3 && allCharsIn(qjoined, qt)) return 25;
+  return 0;
+}
+function highlight(text,query){
+  const tokens=query.trim().split(/\s+/).filter(Boolean);
+  if(!tokens.length) return text;
+  try{ return text.replace(new RegExp("("+tokens.map(esc).join("|")+")","gi"),"<mark>$1</mark>"); }
+  catch(e){ return text; }
+}
+function buildCats(){ /* 게임 목록은 고정이라 HTML에 미리 넣어둠 (즉시 표시) */ }
+function render(){
+  const query=$("#q").value.trim(), cat=$("#cat").value,
+        limit=+$("#limit").value, sort=$("#sort").value;
+  if(!query){
+    $("#meta").innerHTML="";
+    $("#list").innerHTML=`<div class="empty"><b>문제를 검색해보세요</b>위 칸에 문제 일부만 입력하면 정답이 나와요.</div>`;
+    return;
+  }
+  if(!loaded){
+    $("#meta").innerHTML="";
+    $("#list").innerHTML=`<div class="empty"><b><span class="spin"></span> 문제를 불러오는 중…</b>잠시만 기다려주세요.</div>`;
+    return;
+  }
+  let rows=DATA.filter(d=>!cat||d.cat===cat);
+  const tokens=query.split(/\s+/).map(norm).filter(Boolean);
+  const qjoined=tokens.join("");
+  rows = rows.map(d=>({...d,s:score(tokens,qjoined,d)})).filter(d=>d.s>0);
+  if(sort==="rel")       rows.sort((a,b)=>b.s-a.s);
+  else if(sort==="desc") rows.sort((a,b)=>b.q.localeCompare(a.q,"ko"));
+  else                   rows.sort((a,b)=>a.q.localeCompare(b.q,"ko"));
+  const total=rows.length; rows=rows.slice(0,limit);
+  const auto=AUTOCOPY_GAMES.includes(cat);
+  if(!rows.length){
+    $("#meta").innerHTML=`“${query}” 검색결과 <b>0</b>건`;
+    $("#list").innerHTML=`<div class="empty"><b>결과가 없어요</b>다른 단어로 다시 검색해보세요.</div>`;return;
+  }
+  $("#meta").innerHTML=`“${query}” 검색결과 <b>${total}</b>건`+(auto?` · <span class="autonote">맨 위 정답 자동 복사됨</span>`:"");
+  $("#list").innerHTML=rows.map((d,i)=>`
+    <div class="card${auto&&i===0?" top":""}">${cat?"":`<span class="cat">${d.cat}</span>`}
+      <div class="q">${highlight(d.q,query)}</div>
+      <div class="a" data-copy="${escAttr(d.a)}">${highlight(d.a,query)}<svg class="cp" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></div>
+      ${d.by?`<div class="by">제보: <b>${d.by}</b></div>`:""}</div>`).join("");
+  if(auto) copyText(rows[0].a).catch(()=>{});
+}
+
+/* ── 데이터 로드 (압축 파일 받아서 복호화 · 한 번만) ── */
+let loaded=false, loading=false;
+async function ensureLoaded(){
+  if(loaded || loading) return;
+  loading=true;
+  const banner=$("#banner");
+  try{
+    DATA=rowsToData(parseCSV(await decodeData()));
+    loaded=true;
+    banner.className=""; banner.innerHTML="";
+    buildCats(); render();
+  }catch(e){
+    banner.className="banner";
+    console.error("데이터 로드 실패:", e);
+    banner.innerHTML=`<b>문제 데이터를 여는 데 실패했어요.</b><br>잠시 후 다시 시도해 주세요.`;
+  }finally{ loading=false; }
+}
+
+/* ── 팝업 동작 ── */
+const modal=$("#modal"), msg=$("#msg");
+function openModal(){ modal.hidden=false; }
+function closeModal(){ modal.hidden=true; msg.textContent=""; msg.className="msg"; }
+$("#fab").addEventListener("click",openModal);
+$("#mclose").addEventListener("click",closeModal);
+modal.addEventListener("click",e=>{ if(e.target===modal) closeModal(); });
+
+/* ── 업데이트 소식 / 사용법 팝업 ── */
+const infoModal=$("#infoModal");
+function openInfo(title,html){ $("#infoTitle").textContent=title; $("#infoBody").innerHTML=html; infoModal.hidden=false; }
+function closeInfo(){ infoModal.hidden=true; }
+$("#infoClose").addEventListener("click",closeInfo);
+infoModal.addEventListener("click",e=>{ if(e.target===infoModal) closeInfo(); });
+
+const GUIDE_HTML=`<div class="guide">
+  <h4>문제 검색</h4>
+  <p>위에서 게임을 고르고, 검색창에 문제 일부만 입력하면 정답이 나와요. 띄어쓰기·물음표는 무시하니 대충 쳐도 되고, 여러 단어를 띄어서 치면 그 단어가 모두 들어간 문제를 찾아줘요.</p>
+  <h4>정답 복사</h4>
+  <p>정답을 클릭하면 복사돼요. 검색창에서 <kbd>Enter</kbd>를 누르면 맨 위 정답이 복사되고요.</p>
+  <h4>꽁꽁 자동 복사</h4>
+  <p>꽁꽁(주관식) 게임을 선택하면, 검색하는 즉시 맨 위 정답이 자동으로 복사돼요. 바로 붙여넣기(<kbd>Ctrl+V</kbd>) 하면 돼요.</p>
+  <h4>지우기</h4>
+  <p>검색창의 ✕ 버튼이나 <kbd>ESC</kbd> 키로 검색어를 지워요.</p>
+  <h4>제보 / 버그 신고</h4>
+  <p>상단 편지 버튼으로 새 문제를 제보하거나 오류를 신고할 수 있어요. 여러분의 제보로 족보가 채워져요!</p>
+</div>`;
+$("#btn-guide").addEventListener("click",()=>openInfo("사용법", GUIDE_HTML));
+
+async function openUpdates(){
+  openInfo("공지사항", `<div style="text-align:center;color:var(--muted);padding:24px 0"><span class="spin"></span> 불러오는 중…</div>`);
+  if(!UPDATES_CSV_URL){
+    $("#infoBody").innerHTML=`<div style="color:var(--muted);font-size:14px;line-height:1.6">아직 공지사항이 연결되지 않았어요.</div>`;
+    return;
+  }
+  try{
+    const res=await fetch(UPDATES_CSV_URL);
+    if(!res.ok) throw new Error(res.status);
+    let rows=parseCSV(await res.text()).filter(r=>{
+      const a=(r[0]||"").trim(), b=(r[1]||"").trim();
+      if(!a && !b) return false;                 // 빈 줄 제외
+      if(a==="업데이트 날짜" || b==="업데이트 내용") return false; // 제목 줄 제외
+      return true;
+    });
+    rows.sort((x,y)=>(y[0]||"").localeCompare((x[0]||""),"ko")); // 날짜 최신순
+    if(!rows.length){ $("#infoBody").innerHTML=`<div style="color:var(--muted);font-size:14px">등록된 공지가 없어요.</div>`; return; }
+    $("#infoBody").innerHTML=rows.map(r=>`<div class="upd"><div class="d">${escAttr((r[0]||"").trim())}</div><div class="m">${escAttr((r[1]||"").trim())}</div></div>`).join("");
+  }catch(e){
+    $("#infoBody").innerHTML=`<div style="color:var(--muted);font-size:14px;line-height:1.6">공지를 불러오지 못했어요.<br>notice.csv 파일이 사이트에 올라가 있는지 확인해주세요. (오류: ${e.message})</div>`;
+  }
+}
+$("#btn-news").addEventListener("click",openUpdates);
+
+/* ── 독음 빠른찾기 ── */
+const dkModal=$("#dkModal");
+let dkGame="", dkType="전체", dkTypeList=[], DOKEUM=null;
+async function dkEnsure(){
+  if(DOKEUM) return;
+  const res=await fetch("d7k2m9x.txt");
+  if(!res.ok) throw new Error(res.status);
+  const bin=atob((await res.text()).trim()), key=DATA_KEY, bytes=new Uint8Array(bin.length);
+  for(let i=0;i<bin.length;i++) bytes[i]=bin.charCodeAt(i)^key.charCodeAt(i%key.length);
+  const stream=new Blob([bytes]).stream().pipeThrough(new DecompressionStream("gzip"));
+  DOKEUM=JSON.parse(new TextDecoder().decode(await new Response(stream).arrayBuffer()));
+}
+function dkList(){ return (DOKEUM||[]).filter(d=>d.g===dkGame).map(d=>({hanja:d.h,kor:d.k,type:d.t})); }
+function choseong(kr){
+  const map={"ㄲ":"ㄱ","ㄸ":"ㄷ","ㅃ":"ㅂ","ㅆ":"ㅅ","ㅉ":"ㅈ"};
+  const c=(kr||"").charCodeAt(0);
+  if(c>=0xAC00&&c<=0xD7A3){
+    const cho=["ㄱ","ㄲ","ㄴ","ㄷ","ㄸ","ㄹ","ㅁ","ㅂ","ㅃ","ㅅ","ㅆ","ㅇ","ㅈ","ㅉ","ㅊ","ㅋ","ㅌ","ㅍ","ㅎ"][Math.floor((c-0xAC00)/588)];
+    return map[cho]||cho;
+  }
+  return "#";
+}
+function dkRender(){
+  const copyable = dkGame==="꽁꽁";
+  let items=dkList();
+  if(dkType!=="전체") items=items.filter(x=>x.type===dkType);
+  const kw=norm($("#dkq").value);
+  if(kw) items=items.filter(x=>norm(x.hanja).includes(kw)||norm(x.kor).includes(kw));
+  const seen=new Set(); items=items.filter(x=>{const k=x.hanja+"|"+x.kor; if(seen.has(k))return false; seen.add(k); return true;});
+  const fontFor=L=> L<=2?29 : L===3?23 : L===4?18 : L===5?15 : 13;
+  const CHO=["ㄱ","ㄴ","ㄷ","ㄹ","ㅁ","ㅂ","ㅅ","ㅇ","ㅈ","ㅊ","ㅋ","ㅌ","ㅍ","ㅎ"];
+  const isAll = (dkType==="전체");
+
+  const card=x=>`<div class="dk-card ${copyable?'copyable':''}" data-copy="${escAttr(x.kor)}" data-cho="${choseong(x.kor)}">
+        <div class="hanja" style="font-size:${fontFor(x.kor.length)}px">${x.hanja}</div><div class="kor">${x.kor}</div></div>`;
+
+  // 그룹핑: 전체=초성, 유형탭=글자수
+  const groups={}, order=[];
+  if(isAll){
+    items.sort((a,b)=> a.kor.localeCompare(b.kor,"ko"));
+    items.forEach(x=>{ const c=choseong(x.kor); if(!groups[c]){groups[c]=[];order.push(c);} groups[c].push(x); });
+  }else{
+    items.sort((a,b)=> a.kor.length-b.kor.length || a.kor.localeCompare(b.kor,"ko"));
+    items.forEach(x=>{ const L=x.kor.length; if(!groups[L]){groups[L]=[];order.push(L);} groups[L].push(x); });
+  }
+
+  // 초성 점프 바: 전체 탭에서만
+  if(isAll && items.length){
+    const present=new Set(items.map(x=>choseong(x.kor)));
+    $("#dkJump").style.display="flex";
+    $("#dkJump").innerHTML = CHO.filter(c=>present.has(c)).map(c=>`<span data-c="${c}">${c}</span>`).join("");
+  }else{
+    $("#dkJump").style.display="none"; $("#dkJump").innerHTML="";
+  }
+
+  const hint = copyable ? `<div style="text-align:right;font-size:11px;color:var(--muted);margin:0 2px 8px">카드를 눌러 복사</div>` : "";
+  if(!items.length){ $("#dkBody").innerHTML=hint+`<div class="dk-empty">해당하는 독음이 없어요.</div>`; return; }
+  $("#dkBody").innerHTML = hint + order.map(sec=>`
+    <div class="dk-sec">${isAll?sec:sec+"글자"}</div>
+    <div class="dk-grid">${groups[sec].map(card).join("")}</div>`).join("");
+}
+function dkBuildTabs(){
+  const items=dkList();
+  const counts={}; items.forEach(x=>counts[x.type]=(counts[x.type]||0)+1);
+  dkTypeList=["전체", ...Object.keys(counts).sort((a,b)=>counts[b]-counts[a])];
+  $("#dkTabs").innerHTML = dkTypeList.map(t=>{
+    const n = t==="전체" ? items.length : counts[t];
+    return `<button class="dk-tab ${t===dkType?'on':''}" data-t="${t}">${t} · ${n}</button>`;
+  }).join("");
+}
+async function openDokeum(){
+  if(!dkGame) return;
+  dkModal.hidden=false;
+  $("#dkTitle").textContent = `${dkGame} 빠른 독음 찾기`;
+  $("#dkq").value=""; dkType="전체";
+  if(!DOKEUM){
+    $("#dkTabs").innerHTML=""; $("#dkJump").innerHTML=""; $("#dkBody").innerHTML='<div class="dk-empty">불러오는 중…</div>';
+    try{ await dkEnsure(); }catch(e){ $("#dkBody").innerHTML='<div class="dk-empty">독음을 불러오지 못했어요.</div>'; return; }
+  }
+  dkBuildTabs(); dkRender();
+}
+function closeDokeum(){ dkModal.hidden=true; }
+$("#dokeum-open").addEventListener("click",openDokeum);
+$("#dkClose").addEventListener("click",closeDokeum);
+dkModal.addEventListener("click",e=>{ if(e.target===dkModal) closeDokeum(); });
+$("#dkq").addEventListener("input",dkRender);
+$("#dkTabs").addEventListener("click",e=>{ const b=e.target.closest(".dk-tab"); if(!b)return; dkType=b.dataset.t; dkBuildTabs(); dkRender(); });
+$("#dkJump").addEventListener("click",e=>{ const s=e.target.closest("span"); if(!s)return; const el=$(`#dkBody .dk-card[data-cho="${s.dataset.c}"]`); if(el) el.scrollIntoView({behavior:"smooth",block:"start"}); });
+$("#dkBody").addEventListener("click",e=>{ const c=e.target.closest(".dk-card.copyable"); if(!c)return; copyText(c.dataset.copy||"").then(()=>showToast("정답이 복사됐어요!")).catch(()=>{}); });
+
+// 게임 선택 시 독음 버튼 노출 (꽁꽁/올라올라만)
+function updateDokeumBar(){
+  const cat=$("#cat").value;
+  if(cat==="꽁꽁"||cat==="올라올라(꼬로록)"){ dkGame=cat; $("#dokeum-open").hidden=false; }
+  else { $("#dokeum-open").hidden=true; }
+}
+
+/* ── ESC: 팝업 닫기 / 검색어 지우기 ── */
+document.addEventListener("keydown",e=>{
+  if(e.key!=="Escape") return;
+  if(!dkModal.hidden){ closeDokeum(); return; }
+  if(!infoModal.hidden){ closeInfo(); return; }
+  if(!modal.hidden){ closeModal(); return; }
+  if($("#q").value){ $("#q").value=""; render(); }
+});
+
+document.querySelectorAll(".tab").forEach(t=>t.addEventListener("click",()=>{
+  document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
+  t.classList.add("active");
+  const tab=t.dataset.tab;
+  $("#pane-q").hidden = tab!=="q";
+  $("#pane-b").hidden = tab!=="b";
+  msg.textContent=""; msg.className="msg";
+}));
+
+async function submit(type, payload, btn){
+  if(!SUBMIT_ENDPOINT){
+    msg.textContent="아직 제보 저장 기능이 연결되지 않았어요.";
+    msg.className="msg err"; return;
+  }
+  btn.disabled=true; msg.textContent="보내는 중…"; msg.className="msg";
+  try{
+    await fetch(SUBMIT_ENDPOINT, { method:"POST", mode:"no-cors",
+      body:new URLSearchParams({type, ...payload}) });
+    msg.textContent="제출됐어요. 감사합니다!";
+    msg.className="msg ok";
+    setTimeout(closeModal, 1200);
+    // 입력칸 비우기
+    ["f-game","f-question","f-answer","f-by","f-symptom"].forEach(id=>{ if($("#"+id)) $("#"+id).value=""; });
+  }catch(e){
+    msg.textContent="전송에 실패했어요. 잠시 후 다시 시도해주세요.";
+    msg.className="msg err";
+  }finally{ btn.disabled=false; }
+}
+
+$("#send-q").addEventListener("click",e=>{
+  const game=$("#f-game").value.trim(), question=$("#f-question").value.trim(),
+        answer=$("#f-answer").value.trim(), by=$("#f-by").value.trim();
+  if(!game){ msg.textContent="게임을 선택해주세요."; msg.className="msg err"; return; }
+  if(!question || !answer){ msg.textContent="문제와 정답은 꼭 적어주세요."; msg.className="msg err"; return; }
+  submit("question", {game, question, answer, by}, e.currentTarget);
+});
+$("#send-b").addEventListener("click",e=>{
+  const symptom=$("#f-symptom").value.trim();
+  if(!symptom){ msg.textContent="증상을 적어주세요."; msg.className="msg err"; return; }
+  submit("bug", {symptom}, e.currentTarget);
+});
+
+const toast=$("#toast"); let toastT;
+function showToast(t){ toast.textContent=t; toast.classList.add("show"); clearTimeout(toastT); toastT=setTimeout(()=>toast.classList.remove("show"),1300); }
+function copyText(t){
+  if(navigator.clipboard && navigator.clipboard.writeText) return navigator.clipboard.writeText(t);
+  return new Promise((res,rej)=>{ try{ const ta=document.createElement("textarea"); ta.value=t; ta.style.position="fixed"; ta.style.opacity="0"; document.body.appendChild(ta); ta.select(); document.execCommand("copy"); ta.remove(); res(); }catch(e){ rej(e); } });
+}
+$("#list").addEventListener("click",e=>{
+  const el=e.target.closest(".a"); if(!el) return;
+  copyText(el.dataset.copy||"").then(()=>showToast("정답이 복사됐어요!")).catch(()=>showToast("복사에 실패했어요"));
+});
+
+$("#q").addEventListener("focus",ensureLoaded);
+$("#q").addEventListener("input",()=>{ ensureLoaded(); render(); });
+$("#q").addEventListener("keydown",e=>{
+  if(e.key==="Enter"){
+    const first=$("#list .a");
+    if(first) copyText(first.dataset.copy||"").then(()=>showToast("맨 위 정답을 복사했어요!")).catch(()=>{});
+  }
+});
+$("#cat").addEventListener("mousedown",ensureLoaded);
+$("#cat").addEventListener("focus",ensureLoaded);
+$("#cat").addEventListener("change",()=>{ ensureLoaded(); updateDokeumBar(); render(); });
+$("#limit").addEventListener("change",render);
+$("#sort").addEventListener("change",render);
+$("#clear").addEventListener("click",()=>{ $("#q").value=""; $("#q").focus(); render(); });
+
+/* ── 테마 (색 점 5개) ── */
+const THEME_SWATCH={
+  light:"#eef3f8",
+  kkong:"linear-gradient(135deg,#3080d2,#1f5fa8)",
+  koro:"linear-gradient(135deg,#0f8a9c,#0a5f78)",
+  ox:"linear-gradient(135deg,#8fce5a,#5fa838)",
+  dark:"#0E1020"
+};
+const THEME_ORDER=["light","kkong","koro","ox","dark"];
+function applyTheme(t){
+  if(t==="dark") document.body.removeAttribute("data-theme");
+  else document.body.setAttribute("data-theme", t);
+  buildThemeMenu(t);
+}
+function buildThemeMenu(cur){
+  $("#theme-menu").innerHTML = THEME_ORDER.map(k=>
+    `<span class="sw ${k===cur?'on':''}" data-t="${k}" style="background:${THEME_SWATCH[k]}"></span>`).join("");
+}
+(function initTheme(){
+  let t="dark";
+  try{ t = localStorage.getItem("qtheme") || "dark"; }catch(e){}
+  if(!THEME_SWATCH[t]) t="dark";
+  applyTheme(t);
+})();
+$("#theme-btn").addEventListener("click",e=>{ e.stopPropagation(); $("#theme-menu").hidden = !$("#theme-menu").hidden; });
+$("#theme-menu").addEventListener("click",e=>{
+  const s=e.target.closest(".sw"); if(!s) return; e.stopPropagation();
+  applyTheme(s.dataset.t);
+  try{ localStorage.setItem("qtheme", s.dataset.t); }catch(e){}
+  $("#theme-menu").hidden=true;
+});
+document.addEventListener("click",()=>{ if(!$("#theme-menu").hidden) $("#theme-menu").hidden=true; });
+
+render();
+</script>
+</body>
+</html>
